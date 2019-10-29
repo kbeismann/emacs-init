@@ -1891,6 +1891,8 @@
 
       :ensure t
 
+      :leaf-defer nil
+
       :after magit
 
       :hook
