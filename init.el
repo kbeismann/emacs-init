@@ -1318,11 +1318,12 @@
 
     (python-mode-map
      ("C-c t p t" . python-pytest)
+     ("C-c t p r" . python-repeat)
      ("C-c t p p" . python-pytest-popup)
-     ("C-c t p f" . python-pytest-file)
-     ("C-c t p F" . python-pytest-file-dwim)
-     ("C-c t p d" . python-pytest-function)
-     ("C-c t p D" . python-pytest-function-dwim)
+     ("C-c t p D" . python-pytest-file)
+     ("C-c t p d" . python-pytest-file-dwim)
+     ("C-c t p F" . python-pytest-function)
+     ("C-c t p f" . python-pytest-function-dwim)
      ("C-c t p l" . python-pytest-last-failed))
 
     :custom
@@ -1866,21 +1867,27 @@
 
     :bind
 
-    (("C-c g s" . magit-status)
-     ("C-c g c" . magit-clone)
-     ("C-c g b" . magit-blame)
+    (("C-c g s"    . magit-status)
+     ("C-c g l l"  . magit-log)
+     ("C-c g f l"  . magit-log-buffer-file)
+     ("C-c g b c"  . magit-branch-checkout)
      (magit-mode-map
-      ("C-c r s" . magit-reset-soft)
-      ("C-c r h" . magit-reset-hard)
-      ("C-c c a" . magit-commit-amend)
-      ("C-c c r" . magit-commit-reword)
-      ("C-c b c" . magit-branch-checkout)))
+      ("C-c g r s" . magit-reset-soft)
+      ("C-c g r h" . magit-reset-hard)
+      ("C-c g c a" . magit-commit-amend)
+      ("C-c g c r" . magit-commit-reword))
+     (prog-mode-map
+      ("C-c g b b" . magit-blame))
+     (dired-mode-map
+      ("C-c g c c" . magit-clone)))
 
     :config
 
     (leaf magit-todos
 
       :ensure t
+
+      :leaf-defer nil
 
       :after magit
 
@@ -1914,7 +1921,8 @@
 
     :bind
 
-    (("C-c g t" . git-timemachine-toggle))))
+    (prog-mode-map
+     ("C-c g t" . git-timemachine-toggle))))
 
 
 ;; LSP
