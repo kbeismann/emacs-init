@@ -253,6 +253,54 @@
     (concat user-emacs-directory "abbrev/")
     "My abbreviations directory.")
 
+  (defvar my-gitdir
+    "~/gitdir/"
+    "My directory for git repositories.")
+
+  (defvar my-library
+    (concat my-gitdir "library/")
+    "My library repository.")
+
+  (defvar my-bibliography
+    (concat my-library "bibliography.bib")
+    "My bibliography.")
+
+  (defvar my-readings
+    (concat my-library "readings.org")
+    "My list of readings.")
+
+  (defvar my-init
+    (concat my-gitdir "emacs-init/")
+    "My Emacs initialization file repository.")
+
+  (defvar my-orgdir
+    (concat my-gitdir "orgdir/")
+    "My directory for git repositories.")
+
+  (defvar my-library
+    (concat my-gitdir "library/")
+    "My library repository.")
+
+  (defvar my-init
+    (concat my-gitdir "emacs-init/")
+    "My Emacs initialization file repository.")
+
+  (defvar my-notes
+    (concat my-orgdir "notes.org")
+    "My notes.")
+
+  (defvar my-todo-file
+    (concat my-orgdir "todo.org")
+    "My to-do list.")
+
+  (defvar my-mu4e-setup
+    (concat my-gitdir "mu4e-setup/mu4e-setup.el")
+    "My mu4e file.")
+
+  (defvar my-mu4e-setup
+    (concat my-gitdir "mu4e-setup/mu4e-setup.el")
+    "My mu4e file.")
+
   (defvar my-font-manjaro
     "Dina:pixelsize=12"
     "My default font setting for Manjaro.")
@@ -821,11 +869,11 @@
   :config
 
   ;; Path to library only set when directory exists.
-  (let ((path-to-library "~/gitdir/library/"))
+  (let ((path-to-library my-library))
     (when (file-exists-p path-to-library)
       (setq bibtex-completion-library-path path-to-library)))
 
-  (let ((path-to-bib "~/gitdir/library/bibliography.bib"))
+  (let ((path-to-bib my-bibliography))
     (when (file-exists-p path-to-bib)
       (setq bibtex-completion-bibliography path-to-bib))))
 
@@ -1695,8 +1743,9 @@
     :custom
 
     ;; Directories.
-    ((org-directory          . "~/gitdir/orgdir/")
-     (org-default-notes-file . "~/gitdir/orgdir/notes.org")
+    ((org-directory          . my-orgdir)
+     (org-default-notes-file . my-notes)
+     (org-todo-file          . my-todo-file)
      (org-agenda-files       . (list org-directory))
 
      ;; Use relative paths.
@@ -1775,41 +1824,49 @@
     ;; ORG-CAPTURE-TEMPLATES
 
     (setq org-capture-templates
+
+          ;; Basic templates for notes and URLs:
+
           '(;; Key, name, type, target, template, options.
+            ;; ("n" "Save Note" entry
+            ;;  (file+headline "~/gitdir/orgdir/notes.org" "UNSORTED")
+            ;;  "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n"
+            ;;  :empty-lines 1
+            ;;  :prepend 1)
             ("n" "Save Note" entry
-             (file+headline "~/gitdir/orgdir/notes.org" "UNSORTED")
+             (file+headline org-default-notes-file "UNSORTED")
              "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n"
              :empty-lines 1
              :prepend 1)
 
             ;; Key, name, type, target, template, options.
             ("u" "Store URL" entry
-             (file+headline "~/gitdir/orgdir/notes.org" "UNSORTED")
+             (file+headline org-default-notes-file "UNSORTED")
              "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\nURL: %x\n\n%i\n\n"
              :empty-lines 1
              :prepend 1)
 
-            ;; --- TEMPLATES FOR MY TO-DO LIST ---
+            ;; Templates for my personal to-do list:
 
             ("m" "My list")
 
             ;; Key, name, type, target, template, options.
             ("mt" "TODO" entry
-             (file "~/gitdir/orgdir/todo.org")
+             (file org-todo-file)
              "* TODO \[\#B\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n"
              :empty-lines 1
              :prepend 1)
 
             ;; Key, name, type, target, template, options.
             ("ms" "Edit/fix script" entry
-             (file "~/gitdir/orgdir/todo.org")
+             (file org-todo-file)
              "* TODO \[\#B\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\nLINK: %a\n:END:\n\n%i\n\n"
              :empty-lines 1
              :prepend 1)
 
             ;; Key, name, type, target, template, options.
             ("mc" "Save URL and check later" entry
-             (file "~/gitdir/orgdir/todo.org")
+             (file org-todo-file)
              "* TODO \[\#B\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\nURL: %x\n\n%i\n\n"
              :empty-lines 1
              :prepend 1)))
@@ -1941,6 +1998,8 @@
   (leaf magit
 
     :ensure t
+
+    :require t
 
     :leaf-defer nil
 
@@ -2299,10 +2358,9 @@
 
 ;; Only load mu4e when path to repository exists.
 
-(prog1 "Load mu4e setup"
-  (let ((mu4e-setup "~/gitdir/mu4e-setup/mu4e-setup.el"))
-    (when (file-exists-p mu4e-setup)
-      (load mu4e-setup))))
+(prog1 "Load my mu4e setup"
+  (when (file-exists-p my-mu4e-setup)
+    (load my-mu4e-setup)))
 
 
 ;; OPENWITH
@@ -2401,6 +2459,8 @@
 (leaf yaml-mode
 
   :config
+
+  :ensure t
 
   :bind
 
