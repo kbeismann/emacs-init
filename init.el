@@ -1033,13 +1033,6 @@
     :ensure t)
 
 
-  ;; PROFILE INIT FILE
-
-  (leaf esup
-
-    :ensure t))
-
-
 ;; DICTIONARY, FLYCHECK, AND FLYSPELL
 
 (leaf flyspell
