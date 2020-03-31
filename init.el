@@ -726,7 +726,7 @@
 
 (leaf benchmark-init
 
-  :url https://github.com/dholm/benchmark-init-el
+  :url "https://github.com/dholm/benchmark-init-el"
 
   :leaf-defer nil
 
@@ -796,11 +796,9 @@
 
     :ensure t
 
-    :leaf-defer nil
+    ;; :leaf-defer nil
 
-    :require t
-
-    :after dired
+    ;; :require t
 
     :diminish dired-git-info-mode
 
@@ -816,13 +814,13 @@
 
   (leaf dired-subtree
 
+    :disabled t
+
     :ensure t
 
-    :require t
+    ;; :require t
 
-    :leaf-defer nil
-
-    :after dired
+    ;; :leaf-defer nil
 
     :bind
 
@@ -843,8 +841,6 @@
   :ensure t
 
   :ensure tramp-term
-
-  :after dired
 
   :bind
 
@@ -873,7 +869,7 @@
 
   (leaf smtpmail-async
 
-    :after async
+    :after async mu4e
 
     :custom
 
@@ -999,6 +995,8 @@
   ;; DASHBOARD
 
   (leaf dashboard
+
+    :disabled t
 
     :when (version<= "25.1" emacs-version)
 
@@ -1138,8 +1136,6 @@
   (leaf helm-flyspell
 
     :ensure t
-
-    :after helm flyspell
 
     :bind
 
@@ -1332,7 +1328,7 @@
 
   (leaf smartparens
 
-    :url https://github.com/conao3/dotfiles/commit/d9c0f0dc55e7c65517b2c9ce8eb01f96a425ffd1#diff-f48385f05c9a82908d8bd23c391bbbd3
+    :url "https://github.com/conao3/dotfiles/commit/d9c0f0dc55e7c65517b2c9ce8eb01f96a425ffd1#diff-f48385f05c9a82908d8bd23c391bbbd3"
 
     :ensure t
 
@@ -1385,7 +1381,7 @@
 
     :ensure t
 
-    :after company bibtex
+    :after bibtex
 
     :custom
 
@@ -1794,8 +1790,6 @@
 
 (leaf org				; FIXME: Band aid > Use :bind at some point.
 
-  :ensure org-ref
-
   :config
 
   ;; Directories.
@@ -2006,12 +2000,6 @@
 
   :ensure t
 
-  :ensure helm
-
-  :after org
-
-  :require t
-
   ;; :bind
 
   ;; (org-mode-map
@@ -2179,7 +2167,7 @@
 
   (leaf git-timemachine
 
-    :url https://gitlab.com/pidu/git-timemachine
+    :url "https://gitlab.com/pidu/git-timemachine"
 
     :ensure t
 
@@ -2567,14 +2555,15 @@
 
 (leaf ein
 
-  :disabled t
+  ;; :disabled t
 
-  ;; :ensure nil
+  :ensure t
 
-  :config
+  ;; :config
 
-  ;; Work-around for proxy issues.  Not sure if this works.
-  (setq request-curl-options '("--noproxy" "127.0.0.1:8888")))
+  ;; ;; Work-around for proxy issues.  Not sure if this works.
+  ;; (setq request-curl-options '("--noproxy" "127.0.0.1:8888"))
+  )
 
 
 ;; TYPIT
@@ -2618,8 +2607,6 @@
 
 (leaf ediff
 
-  :after helm
-
   :custom
 
   ((ediff-window-setup-function . 'ediff-setup-windows-plain) ; Don't start another frame.
@@ -2636,9 +2623,11 @@
 
 (leaf dired-rsync
 
+  :disabled t
+
   :ensure t
 
-  :url https://github.com/stsquad/dired-rsync
+  :url "https://github.com/stsquad/dired-rsync"
 
   :doc "Adds single command to sync dired buffer with remote."
 
@@ -2656,7 +2645,9 @@
 
 (leaf ssh-deploy
 
-  :url https://github.com/cjohansson/emacs-ssh-deploy
+  :disabled t
+
+  :url "https://github.com/cjohansson/emacs-ssh-deploy"
 
   :doc "Effortlessly deploy local files and directories to remote hosts via Tramp."
 
@@ -2723,6 +2714,8 @@
 
 (leaf emms
 
+  :disabled t
+
   :doc
 
   "EMMS is the Emacs Multi-Media System. It tries to be a clean
@@ -2731,7 +2724,7 @@
   MpthreePlayer, but it tries to be more general and cleaner. It
   is comparable to Bongo."
 
-  :url https://www.emacswiki.org/emacs/
+  :url "https://www.emacswiki.org/emacs/"
 
   :ensure t
 
