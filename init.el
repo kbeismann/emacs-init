@@ -213,19 +213,6 @@
       (leaf-keywords-init))))
 
 
-;; WORK-RELATED SETTINGS
-
-(leaf *work-related-settings
-
-  :doc "Load work-related settings if file exists"
-
-  :config
-
-  (let ((proxies "~/gitdir/work-git/emacs-init/proxies.el"))
-    (when (file-exists-p proxies)
-      (load proxies))))
-
-
 ;; BASIC VARIABLES
 
 ;; Defines a number of directories and files in ~/.emacs.d/.
@@ -607,8 +594,8 @@
                                     (message (concat font1 "done"))) ; Works for emacsclient as well.
                            (message "Missing font family: %s" my-font-family-ubuntu))
                          (message "Adjusting frame parameters...")
-                         (add-to-list 'default-frame-alist '(height . 60))
-                         (add-to-list 'default-frame-alist '(width  . 200))
+                         (add-to-list 'default-frame-alist '(height . 50))
+                         (add-to-list 'default-frame-alist '(width  . 180))
                          (message "Adjusting frame parameters...done"))
 
                 (message "No predefined font settings found")))))
@@ -726,7 +713,7 @@
 
 (leaf benchmark-init
 
-  :url https://github.com/dholm/benchmark-init-el
+  :url "https://github.com/dholm/benchmark-init-el"
 
   :leaf-defer nil
 
@@ -796,11 +783,9 @@
 
     :ensure t
 
-    :leaf-defer nil
+    ;; :leaf-defer nil
 
-    :require t
-
-    :after dired
+    ;; :require t
 
     :diminish dired-git-info-mode
 
@@ -816,13 +801,13 @@
 
   (leaf dired-subtree
 
+    :disabled t
+
     :ensure t
 
-    :require t
+    ;; :require t
 
-    :leaf-defer nil
-
-    :after dired
+    ;; :leaf-defer nil
 
     :bind
 
@@ -840,29 +825,20 @@
 
 (leaf tramp
 
-  ;; :disabled t
-
   :ensure t
 
   :ensure tramp-term
-
-  :after dired
 
   :bind
 
   ("C-c t h" . helm-tramp)
 
-  :config
+  :custom
 
-  (setq tramp-debug-buffer t))
-
-;; :custom
-
-;; (
-;; ("ssh" . tramp-default-method)
-;; (10    . tramp-verbose)
-;;  )
-;; )
+  ((tramp-debug-buffer . t)
+   (tramp-read-passwd  . t)
+   (tramp-default-method . "ssh")
+   (tramp-verbose . 10)))
 
 
 ;; ASYNC
@@ -880,7 +856,7 @@
 
   (leaf smtpmail-async
 
-    :after async
+    :after async mu4e
 
     :custom
 
@@ -1011,6 +987,8 @@
 
   (leaf dashboard
 
+    :disabled t
+
     :when (version<= "25.1" emacs-version)
 
     :ensure t
@@ -1034,21 +1012,7 @@
 
     (add-to-list 'dashboard-items '(agenda) t)
 
-    (dashboard-setup-startup-hook))
-
-
-  ;; DEBUGGING INIT FILE
-
-  (leaf bug-hunter
-
-    :ensure t)
-
-
-  ;; PROFILE INIT FILE
-
-  (leaf esup
-
-    :ensure t))
+    (dashboard-setup-startup-hook)))
 
 
 ;; DICTIONARY, FLYCHECK, AND FLYSPELL
@@ -1163,8 +1127,6 @@
   (leaf helm-flyspell
 
     :ensure t
-
-    :after helm flyspell
 
     :bind
 
@@ -1410,7 +1372,7 @@
 
     :ensure t
 
-    :after company bibtex
+    :after bibtex
 
     :custom
 
@@ -1576,6 +1538,8 @@
     (leaf python-pytest
 
       :ensure t
+
+      :ensure projectile
 
       :after python
 
@@ -1817,8 +1781,6 @@
 
 (leaf org				; FIXME: Band aid > Use :bind at some point.
 
-  :ensure org-ref
-
   :config
 
   ;; Directories.
@@ -1947,22 +1909,24 @@
 
         ;; Basic templates for notes and URLs:
 
-        '(;; Key, name, type, target, template, options.
+        '(
+          ;; Key, name, type, target, template, options.
           ;; ("n" "Save Note" entry
           ;;  (file+headline "~/gitdir/orgdir/notes.org" "UNSORTED")
-          ;;  "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n\n"
+          ;;  "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n"
           ;;  :empty-lines 1
           ;;  :prepend 1)
+
           ("n" "Save Note" entry
            (file+headline org-default-notes-file "UNSORTED")
-           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n\n"
+           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\n%i\n\n"
            :empty-lines 1
            :prepend 1)
 
           ;; Key, name, type, target, template, options.
           ("u" "Store URL" entry
            (file+headline org-default-notes-file "UNSORTED")
-           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\nURL: %x\n\n%i\n\n\n"
+           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:created: %U\n:END:\n\nURL: %x\n\n%i\n\n"
            :empty-lines 1
            :prepend 1)
 
@@ -2028,12 +1992,6 @@
 (leaf org-ref
 
   :ensure t
-
-  :ensure helm
-
-  :after org
-
-  :require t
 
   ;; :bind
 
@@ -2590,14 +2548,15 @@
 
 (leaf ein
 
-  :disabled t
+  ;; :disabled t
 
-  ;; :ensure nil
+  :ensure t
 
-  :config
+  ;; :config
 
-  ;; Work-around for proxy issues.  Not sure if this works.
-  (setq request-curl-options '("--noproxy" "127.0.0.1:8888")))
+  ;; ;; Work-around for proxy issues.  Not sure if this works.
+  ;; (setq request-curl-options '("--noproxy" "127.0.0.1:8888"))
+  )
 
 
 ;; TYPIT
@@ -2641,8 +2600,6 @@
 
 (leaf ediff
 
-  :after helm
-
   :custom
 
   ((ediff-window-setup-function . 'ediff-setup-windows-plain) ; Don't start another frame.
@@ -2659,9 +2616,11 @@
 
 (leaf dired-rsync
 
+  :disabled t
+
   :ensure t
 
-  :url https://github.com/stsquad/dired-rsync
+  :url "https://github.com/stsquad/dired-rsync"
 
   :doc "Adds single command to sync dired buffer with remote."
 
@@ -2681,7 +2640,9 @@
 
   :disabled t
 
-  :url https://github.com/cjohansson/emacs-ssh-deploy
+  :url "https://github.com/cjohansson/emacs-ssh-deploy"
+
+  :doc "Effortlessly deploy local files and directories to remote hosts via Tramp."
 
   :ensure t
 
@@ -2746,6 +2707,8 @@
 
 (leaf emms
 
+  :disabled t
+
   :doc
 
   "EMMS is the Emacs Multi-Media System. It tries to be a clean
@@ -2754,9 +2717,7 @@
   MpthreePlayer, but it tries to be more general and cleaner. It
   is comparable to Bongo."
 
-  :url
-
-  "https://www.emacswiki.org/emacs/"
+  :url "https://www.emacswiki.org/emacs/"
 
   :ensure t
 
@@ -2768,6 +2729,40 @@
   :config
 
   (leaf emms-streams))
+
+
+;; CENTERED WINDOW MODE
+
+(leaf centered-window
+
+  :ensure t)
+
+
+;; WORK-RELATED SETTINGS
+
+(leaf *work-related-settings
+
+  :doc "Load work-related settings if file exists"
+
+  :config
+
+  ;; If the directory exists, load proxy settings.
+  (let ((proxies "~/gitdir/work-git/emacs-init/proxies.el"))
+    (if (file-exists-p proxies)
+        (progn
+          (message "%s" "Found proxy settings for work...")
+          (load proxies))
+      (message "%s" "No proxy settings specified.")
+      ))
+
+  ;; If the directory exists, load templates for work.
+  (let ((templates "~/gitdir/work-git/emacs-init/templates.el"))
+    (if (and (file-exists-p templates)
+             (boundp 'org-capture-templates))
+        (progn
+          (message "%s" "Adding templates for work...")
+          (load templates))
+      (message "%s" "No additional templates specified."))))
 
 
 ;;; Footer:
