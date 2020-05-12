@@ -276,7 +276,7 @@
     "My notes.")
 
   (defvar my-todo-file
-    (concat my-orgdir "todo.org")
+    (concat my-orgdir "todos.org")
     "My to-do list.")
 
   (defvar my-mu4e-setup
@@ -1952,20 +1952,20 @@
         '(
           ;; Key, name, type, target, template, options.
           ;; ("n" "Save Note" entry
-          ;;  (file+headline "~/gitdir/orgdir/notes.org" "UNSORTED")
+          ;;  (file+headline "~/gitdir/orgdir/notes.org" "Unsorted")
           ;;  "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n%i\n\n"
           ;;  :empty-lines 1
           ;;  :prepend 1)
 
           ("n" "Save note" entry
-           (file+headline org-default-notes-file "UNSORTED")
+           (file+headline org-default-notes-file "Unsorted")
            "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n%i\n\n"
            :empty-lines 1
            :prepend 1)
 
           ;; Key, name, type, target, template, options.
           ("u" "Store URL" entry
-           (file+headline org-default-notes-file "UNSORTED")
+           (file+headline org-default-notes-file "Unsorted")
            "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n:URL: %x\n\n%i\n\n"
            :empty-lines 1
            :prepend 1)
@@ -2477,7 +2477,9 @@
 
   :disabled t
 
-  ;; :ensure poly-R
+  :ensure t
+
+  :ensure poly-R
 
   :mode                                 ; TODO: Cleanup > Sort this.
 
