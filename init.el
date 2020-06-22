@@ -2238,6 +2238,15 @@
                                      (org-pdfview-open link))))))
 
 
+  (leaf nov
+
+    :ensure t
+
+    :config
+
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+
+
   ;; ORG-NOTER
 
   ;; Org-noter's purpose is to let you create notes that are kept in sync when
