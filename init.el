@@ -36,8 +36,7 @@
 ;; upfront.  Note that Pango removed support for bitmap fonts with version
 ;; 1.33.
 
-;; Some optional settings, e.g. my mu4e setup, are not part of this
-;; repository.
+;; Some optional settings are not part of this repository.
 
 
 ;;; Installation:
@@ -85,11 +84,10 @@
 
 ;;; To-do:
 
-;; * NEXT: Structure > Init file in org?
-;; * NEXT: Structure > Use function/package to toggle proxies.
 ;; * NEXT: Structure > External repository for snippets.
 ;; * TODO: Fix > The org/org-ref setup is too messy.
-;; * TODO: Add global settings for Org Columns view.
+;; * TODO: Minor > Add global settings for Org Columns view.
+;; * TODO: Formatting > Format this file with a formatter.
 
 
 ;;; Code:
@@ -278,13 +276,13 @@
     (concat my-gitdir "emacs-init/")
     "My Emacs initialization file repository.")
 
+  (defvar my-org-templates
+    (concat my-init "templates.el")
+    "My Org templates.")
+
   (defvar my-orgdir
     (concat my-gitdir "orgdir/")
     "My directory for git repositories.")
-
-  (defvar my-init
-    (concat my-gitdir "emacs-init/")
-    "My Emacs initialization file repository.")
 
   (defvar my-notes
     (concat my-orgdir "notes.org")
@@ -820,51 +818,19 @@
      (dired-listing-switches                  . "-lahgF --group-directories-first")
      (delete-by-moving-to-trash               . t)))
 
-
   (leaf dired-du
 
     :ensure t
 
     :diminish dired-du-mode
 
-    ;; :hook
-
-    ;; (dired-mode-hook . dired-du-mode)
-
     :custom
 
     (dired-du-size-format . t))
 
-
-  (leaf dired-git-info
-
-    :ensure t
-
-    ;; :leaf-defer nil
-
-    ;; :require t
-
-    :diminish dired-git-info-mode
-
-    ;; :hook
-
-    ;; (dired-mode-hook . dired-git-info-mode)
-
-    :bind
-
-    (dired-mode-map
-     (")" . dired-git-info-mode)))
-
-
   (leaf dired-subtree
 
-    :disabled t
-
     :ensure t
-
-    ;; :require t
-
-    ;; :leaf-defer nil
 
     :bind
 
@@ -959,7 +925,19 @@
 
     :custom
 
-    ((eldoc-idle-delay . 0.2))))
+    ((eldoc-idle-delay . 0.2)))
+
+  (leaf indent-lint
+
+    :ensure flyspell-indent
+
+    :ensure t
+
+    :config
+
+    (eval-after-load 'flycheck
+      '(flycheck-indent-setup)))
+  )
 
 
 ;; BIBTEX
@@ -1343,6 +1321,9 @@
 (leaf whole-line-or-region
 
   :ensure t
+
+  :diminish (whole-line-or-region-global-mode
+             whole-line-or-region-local-mode)
 
   :config
 
@@ -1981,24 +1962,6 @@
      ;; (org-agenda-start-on-weekday . 1)
      (org-agenda-span             . 6)))
 
-  (leaf german-holidays
-
-    :disabled t
-
-    :ensure t
-
-    :config
-
-    ;; Show German holidays only.
-    ;; (calendar-holidays . (append (calendar)))
-    (setq calendar-holidays holiday-german-NW-holidays))
-
-  ;; Switch entry to DONE when all subentries are done, to TODO otherwise.
-  (defun org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are done, to TODO otherwise."
-    (let (org-log-done-with-time org-log-states)   ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-
   ;; Always insert blank line before headings.
   (setq org-blank-before-new-entry '((heading         . auto)
                                      (plain-list-item . auto)))
@@ -2019,96 +1982,59 @@
 
   ;; ORG-CAPTURE-TEMPLATES
 
-  (setq org-capture-templates           ; TODO: Clean up and restructure the templates.
+  (leaf *org-capture-templates
 
-        ;; Basic templates for notes and URLs:
+    :doc "Templates for org-capture"
 
-        '(
-          ;; Key, name, type, target, template, options.
-          ;; ("n" "Save Note" entry
-          ;;  (file+headline "~/gitdir/orgdir/notes.org" "Unsorted")
-          ;;  "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n%i\n\n"
-          ;;  :empty-lines 1
-          ;;  :prepend 1)
+    :config
 
-          ("n" "Save note" entry
-           (file+headline org-default-notes-file "Unsorted")
-           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n%i\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Key, name, type, target, template, options.
-          ("u" "Store URL" entry
-           (file+headline org-default-notes-file "Unsorted")
-           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n:URL: %x\n\n%i\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Templates for my personal to-do list:
-
-          ("m" "My to-do list")
-
-          ;; Key, name, type, target, template, options.
-          ("mt" "TODO" entry
-           (file+headline org-todo-file "To-dos")
-           "* TODO \[\#C\] %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n%i\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Key, name, type, target, template, options.
-          ("me" "Edit/fix file" entry
-           (file+headline org-todo-file "To-dos")
-           "* TODO \[\#C\] %^{Title} %^g:code:\n:PROPERTIES:\n:CREATED: %U\n:LINK: %a\n:END:\n\n%i\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Key, name, type, target, template, options.
-          ("mu" "Save URL and check later" entry
-           (file+headline org-todo-file "To-dos")
-           "* TODO \[\#C\] %^{Title} %^g:url:\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n:URL: %x\n\n%i\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Key, name, type, target, template, options.
-          ("mm" "Meeting minutes" entry
-           (file+headline org-default-dpdhl-notes-file "Unsorted")
-           "* TODO \[\#A\] %^{Title} :meeting:minutes:%^g\nSCHEDULED: %T\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n- *Attendees:*\n\n  + [X] Karsten Beismann\n\n- *Agenda:*\n\n  1. ...%i\n\n - *Notes:*\n\n  + ...\n\n- *Next steps:*\n\n  + ...\n\n"
-           :empty-lines 1
-           :prepend 1)
-
-          ;; Key, name, type, target, template, options.
-          ("ms" "Stand-up" entry
-           (file+headline org-default-dpdhl-notes-file "Unsorted")
-           "* TODO \[\#A\] Stand-up :meeting:standup:%^g\nSCHEDULED: %T\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n- *Progress since the last meeting:*\n\n  1. ...%i\n\n- *Outlook:*\n\n  1. ...\n\n - *Questions/collaboration:*\n\n  + ...\n\n- *Notes:*\n\n  + ...\n\n"
-           :empty-lines 1
-           :prepend 1)))
+    ;; If the directory exists, load templates for work.
+    (let ((templates my-org-templates))
+      (if (and (file-exists-p templates)
+               (boundp 'org-capture-templates))
+          (progn
+            (message "%s" "Adding templates...")
+            (load templates))
+        (message "%s" "No templates specified."))))
 
 
-  ;; CLEAN TAGS IN ORG MODE
+  (leaf *org-remove-tags
 
-  ;; Source: https://fuco1.github.io/2017-05-09-Automatically-remove-inherited-tags-from-tasks-after-refiling.html
+    :doc "Clean tags in org mode."
 
-  ;; Note: * Updated for Org 9.2.
+    :url "https://fuco1.github.io/2017-05-09-Automatically-remove-inherited-tags-from-tasks-after-refiling.html"
 
-  (defun my-org-remove-inherited-local-tags ()
-    "Remove local tags that can be inherited instead."
-    (let* ((target-tags-local (org-get-tags nil 'local))
-           ;; We have to remove the local tags otherwise they would not
-           ;; show up as being inherited if they are present on
-           ;; parents---the local tag would "override" the parent
-           (target-tags-inherited
-            (unwind-protect
-                (progn
-                  (org-set-tags nil)
-                  (org-get-tags))
-              (org-set-tags target-tags-local))))
-      (-each target-tags-local
-        (lambda (tag)
-          (when (member tag target-tags-inherited)
-            (org-toggle-tag tag 'off))))))
+    :config
 
-  (add-hook 'org-after-refile-insert-hook 'my-org-remove-inherited-local-tags)
+    (defun my-org-remove-inherited-local-tags ()
+      "Remove local tags that can be inherited instead."
+      (let* ((target-tags-local (org-get-tags nil 'local))
+             ;; We have to remove the local tags otherwise they would not
+             ;; show up as being inherited if they are present on
+             ;; parents---the local tag would "override" the parent
+             (target-tags-inherited
+              (unwind-protect
+                  (progn
+                    (org-set-tags nil)
+                    (org-get-tags))
+                (org-set-tags target-tags-local))))
+        (-each target-tags-local
+          (lambda (tag)
+            (when (member tag target-tags-inherited)
+              (org-toggle-tag tag 'off))))))
 
+    (add-hook 'org-after-refile-insert-hook 'my-org-remove-inherited-local-tags))
+
+  (leaf *org-summary-todo
+
+    :doc "Switch entry to DONE when all subentries are done, to TODO otherwise."
+
+    :config
+
+    (defun org-summary-todo (n-done n-not-done)
+      "Switch entry to DONE when all subentries are done, to TODO otherwise."
+      (let (org-log-done-with-time org-log-states)   ; turn off logging
+        (org-todo (if (= n-not-done 0) "DONE" "TODO")))))
 
   ;; Don't confirm before evaluating.
   (setq org-confirm-babel-evaluate nil)
@@ -2122,6 +2048,9 @@
      (python     . t)
      (R          . t)
      (latex      . t)))
+
+  ;; Use Python 3
+  (setq org-babel-python-command "python3")
 
   ;; Better source block behavior.
   (setq org-src-preserve-indentation t
@@ -2140,80 +2069,33 @@
 
   (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 
-  ;; Use Python 3
-  (setq org-babel-python-command "python3")
-
-  (leaf org-super-agenda
-
-    :disabled t
+  (leaf org-ref
 
     :ensure t
 
-    :config
+    ;; :bind
 
-    (org-super-agenda-mode)
+    ;; (org-mode-map
+    ;;  ("C-c i c" . org-ref-helm-insert-cite-link)
+    ;;  ("C-c i r" . crossref-lookup))
 
-    (setq org-super-agenda-groups
-          '(
-            (:name "PCT"
-                   :time-grid t
-                   :tag ("pct"))
-            (:name "Urgent"
-                   :priority "A")
-            (:name "Blocked"
-                   :todo "BLOCKED")
-            (:priority<= "B"
-                         :scheduled future
-                         :order 1)))
+    :init
 
-    )
+    (prog1 "Set paths to bibliography files."
 
-  )
+      (setq reftex-use-external-file-finders t) ; Use this to find bibliographies.
+      (setq reftex-external-file-finders
+            '(("tex" . "/usr/bin/kpsewhich -format=.tex %f")
+              ("bib" . "/usr/bin/kpsewhich -format=.bib %f")))
+      (setq reftex-default-bibliography '("~/gitdir/my-git/library/bibliography.bib"))
+      (setq org-ref-default-bibliography '("~/gitdir/my-git/library/bibliography.bib")
+            org-ref-bibliography-notes "~/gitdir/my-git/library/notes.org"
+            org-ref-pdf-directory "~/gitdir/my-git/library/archive/")
 
-
-(leaf org-ref
-
-  :ensure t
-
-  ;; :bind
-
-  ;; (org-mode-map
-  ;;  ("C-c i c" . org-ref-helm-insert-cite-link)
-  ;;  ("C-c i r" . crossref-lookup))
-
-  :init
-
-  (prog1 "Set paths to bibliography files."
-
-    (setq reftex-use-external-file-finders t) ; Use this to find bibliographies.
-    (setq reftex-external-file-finders
-          '(("tex" . "/usr/bin/kpsewhich -format=.tex %f")
-            ("bib" . "/usr/bin/kpsewhich -format=.bib %f")))
-    (setq reftex-default-bibliography '("~/gitdir/my-git/library/bibliography.bib"))
-    (setq org-ref-default-bibliography '("~/gitdir/my-git/library/bibliography.bib")
-          org-ref-bibliography-notes "~/gitdir/my-git/library/notes.org"
-          org-ref-pdf-directory "~/gitdir/my-git/library/archive/")
-
-    ;; Add "bibtex %b" to enable bibtex export.
-    ;; Source: https://github.com/jkitchin/org-ref
-    ;; (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
-    (setq org-latex-pdf-process (list "latexmk -pdflatex=lualatex -shell-escape -bibtex -f -pdf %f"))))
-
-
-;; ORG-JOURNAL
-
-(leaf org-journal
-
-  :disabled t
-
-  :after org
-
-  ;; :ensure nil
-
-  :config
-
-  (setq org-journal-directory "~/gitdir/my-git/journal/")
-  (setq org-journal-date-format "%Y-%m-%d, %A"))
+      ;; Add "bibtex %b" to enable bibtex export.
+      ;; Source: https://github.com/jkitchin/org-ref
+      ;; (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+      (setq org-latex-pdf-process (list "latexmk -pdflatex=lualatex -shell-escape -bibtex -f -pdf %f")))))
 
 
 ;; PDF-TOOLS
@@ -2317,13 +2199,10 @@
     :bind
 
     (("C-c g s"    . magit-status)
-     ("C-c g l l"  . magit-log)
-     ("C-c g f l"  . magit-log-buffer-file)
-     ("C-c g b c"  . magit-branch-checkout)
 
-     (magit-mode-map
-      ("C-c g c a" . magit-commit-amend)
-      ("C-c g c r" . magit-commit-reword))
+     ;; (magit-mode-map
+     ;; ("C-c g c a" . magit-commit-amend)
+     ;; ("C-c g c r" . magit-commit-reword))
 
      (prog-mode-map
       ("C-c g b b" . magit-blame))
