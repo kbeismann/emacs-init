@@ -1340,7 +1340,6 @@ https://emacs.stackexchange.com/questions/32150/how-to-add-a-timestamp-to-each-e
     (leaf flycheck-pycheckers
       :ensure t
       :ensure flycheck
-      :after python flycheck
       :custom
       ((flycheck-pycheckers-multi-thread    . "true")
        (flycheck-pycheckers-max-line-length . 88)
@@ -1348,7 +1347,6 @@ https://emacs.stackexchange.com/questions/32150/how-to-add-a-timestamp-to-each-e
        (flycheck-pycheckers-checkers        .
                                             '(pylint flake8 mypy3 bandit)))
       :config
-
       ;; TODO: Add this to :hook.
       (with-eval-after-load 'flycheck
         (add-hook 'flycheck-mode-hook
@@ -1997,9 +1995,7 @@ https://emacs.stackexchange.com/questions/32150/how-to-add-a-timestamp-to-each-e
     :custom
     (auth-sources .
                   '("~/.authinfo.gpg")))
-  (leaf pinentry
-    :config
-    (pinentry-start)))
+  (leaf pinentry))
 
 ;; MU4E/MAILS
 
